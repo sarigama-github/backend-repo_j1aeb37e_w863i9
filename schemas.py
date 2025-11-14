@@ -12,9 +12,10 @@ Model name is converted to lowercase for the collection name:
 """
 
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, Literal
+from datetime import datetime
 
-# Example schemas (replace with your own):
+# Example schemas (you can keep these for reference):
 
 class User(BaseModel):
     """
@@ -38,11 +39,33 @@ class Product(BaseModel):
     category: str = Field(..., description="Product category")
     in_stock: bool = Field(True, description="Whether product is in stock")
 
-# Add your own schemas here:
+# Car Wash Franchise Schemas
 # --------------------------------------------------
 
-# Note: The Flames database viewer will automatically:
-# 1. Read these schemas from GET /schema endpoint
-# 2. Use them for document validation when creating/editing
-# 3. Handle all database operations (CRUD) directly
-# 4. You don't need to create any database endpoints!
+class Plan(BaseModel):
+    """Subscription plan details (collection: plan)"""
+    name: str
+    description: Optional[str] = None
+    price_monthly: float = Field(..., ge=0)
+    price_yearly: float = Field(..., ge=0)
+    washes_per_month: int = Field(..., ge=1)
+    popular: bool = False
+
+class Subscription(BaseModel):
+    """Customer subscriptions (collection: subscription)"""
+    customer_name: str
+    email: str
+    phone: Optional[str] = None
+    vehicle: Optional[str] = None
+    plan_name: str
+    billing_cycle: Literal["monthly", "yearly"] = "monthly"
+    status: Literal["pending", "active", "cancelled"] = "pending"
+    start_date: Optional[datetime] = None
+    notes: Optional[str] = None
+
+class Lead(BaseModel):
+    """Marketing leads captured from landing page (collection: lead)"""
+    name: str
+    email: str
+    phone: Optional[str] = None
+    message: Optional[str] = None
